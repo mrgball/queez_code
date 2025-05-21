@@ -81,6 +81,40 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 24),
             _buildListQuiz(),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: SizedBox(
+                height: context.screenHeight * 0.07,
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: context.textDark,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      MyRouter.chooseDifficulty,
+                      arguments: {
+                        'category': categories[selectedIndex.value],
+                      },
+                    );
+                  },
+                  child: Text(
+                    'Play Quiz',
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -175,36 +209,6 @@ class _HomeScreenState extends State<HomeScreen> {
           Image.network(
             imageUrl,
             width: context.screenWidth * 0.2,
-          ),
-          const Spacer(),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: color,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: () {
-                Navigator.pushNamed(
-                  context,
-                  MyRouter.chooseDifficulty,
-                  arguments: {
-                    'category': categories[selectedIndex.value],
-                  },
-                );
-              },
-              child: Text(
-                'Play Quiz',
-                style: context.textTheme.bodyLarge?.copyWith(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
           ),
         ],
       ),

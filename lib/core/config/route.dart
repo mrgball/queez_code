@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../features/home/presentation/screen/home_screen.dart';
+import '../../features/quiz/presentation/screen/quiz_screen.dart';
 import '../shared/screen/choose_difficulty_screen.dart';
 
 class MyRouter {
   // DEFINING ROUTES HERE:
   static const String routeHome = '/home';
   static const String chooseDifficulty = '/choose-difficulty';
+  static const String quiz = '/quiz';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     late Widget Function(BuildContext) screenDestination;
@@ -21,7 +23,15 @@ class MyRouter {
         screenDestination = (_) => const HomeScreen();
         break;
       case chooseDifficulty:
-        screenDestination = (_) => const ChooseDifficultyScreen();
+        screenDestination = (_) => ChooseDifficultyScreen(
+              category: arguments?['category'],
+            );
+        break;
+      case quiz:
+        screenDestination = (_) => QuizScreen(
+              category: arguments?['category'],
+              difficulty: arguments?['difficulty'],
+            );
         break;
 
       default:
