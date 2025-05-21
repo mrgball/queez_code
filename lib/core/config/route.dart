@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../features/home/presentation/screen/home_screen.dart';
+import '../shared/screen/choose_difficulty_screen.dart';
 
 class MyRouter {
   // DEFINING ROUTES HERE:
   static const String routeHome = '/home';
-  static const String routeDetailSurah = '/detail-surah';
+  static const String chooseDifficulty = '/choose-difficulty';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    /// Defining Routes Here:
-    /// 1. routeHome
-    const String routeHome = '/home';
-
     late Widget Function(BuildContext) screenDestination;
     Map<String, dynamic>? arguments;
 
@@ -22,6 +19,9 @@ class MyRouter {
     switch (settings.name) {
       case routeHome:
         screenDestination = (_) => const HomeScreen();
+        break;
+      case chooseDifficulty:
+        screenDestination = (_) => const ChooseDifficultyScreen();
         break;
 
       default:

@@ -1,5 +1,6 @@
 import 'package:code_queez/core/config/constant.dart';
 import 'package:code_queez/core/config/extension.dart';
+import 'package:code_queez/core/config/route.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -26,12 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
         'hp': 100,
         'color': getAppColors(context)[i % getAppColors(context).length],
         'icon': Icons.question_mark,
+        'imageUrl': category.imageUrl,
       };
     });
   }
 
   double getRotationAngle(int index) {
-    if (index == selectedIndex) {
+    if (index == selectedIndex.value) {
       return 0.0;
     } else if (index == selectedIndex.value - 1) {
       return -0.07;
@@ -116,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     angle: getRotationAngle(index),
                     child: _quizCard(
                       title: item['title'],
+                      imageUrl: item['imageUrl'] ?? '',
                       description: item['description'],
                       hp: item['hp'],
                       color: item['color'],
@@ -137,10 +140,10 @@ class _HomeScreenState extends State<HomeScreen> {
     required int hp,
     required Color color,
     required IconData image,
+    required String imageUrl,
   }) {
     return Container(
       width: context.screenWidth * 0.7,
-      height: context.screenHeight * 0.2,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
@@ -152,9 +155,9 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             title,
-            style: context.textTheme.headlineLarge?.copyWith(
+            style: context.textTheme.headlineSmall?.copyWith(
               color: color,
-              fontSize: 26,
+              fontSize: 32,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -168,6 +171,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             textAlign: TextAlign.center,
           ),
+          const SizedBox(height: 32),
+          Image.network(
+            imageUrl,
+            width: context.screenWidth * 0.2,
+          ),
           const Spacer(),
           SizedBox(
             width: double.infinity,
@@ -179,7 +187,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushNamed(
+                  context,
+                  MyRouter.chooseDifficulty,
+                  arguments: {
+                    'category': categories[selectedIndex.value],
+                  },
+                );
+              },
               child: Text(
                 'Play Quiz',
                 style: context.textTheme.bodyLarge?.copyWith(
