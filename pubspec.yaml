@@ -38,7 +38,6 @@ dependencies:
   flutter_dotenv: ^5.2.1
   get_it: ^8.0.3
   google_fonts: ^6.2.1
-  requests_inspector: ^4.2.3
   visibility_detector: ^0.4.0+2
 
 dev_dependencies:

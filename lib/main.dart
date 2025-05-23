@@ -1,4 +1,6 @@
 import 'dart:async'; //
+import 'package:code_queez/core/shared/screen/error_screen.dart';
+import 'package:code_queez/features/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:code_queez/core/config/global.dart';
@@ -7,10 +9,9 @@ import 'package:code_queez/core/theme/custom_theme.dart';
 import 'package:code_queez/core/utils/injector.dart';
 import 'package:code_queez/features/home/presentation/screen/home_screen.dart';
 import 'package:code_queez/features/quiz/presentation/bloc/quiz_bloc.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:requests_inspector/requests_inspector.dart';
+// import 'package:requests_inspector/requests_inspector.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,19 +24,11 @@ void main() async {
     FlutterError.presentError(details);
   };
 
-  runZonedGuarded(() {
-    runApp(
-      const RequestsInspector(
-        enabled: kDebugMode,
-        showInspectorOn: ShowInspectorOn.Both,
-        navigatorKey: null,
-        child: MyApp(),
-      ),
-    );
-  }, (Object error, StackTrace stackTrace) {
-    debugPrint('Uncaught error: $error');
-    debugPrint('Stack trace: $stackTrace');
-  });
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return ErrorScreen(error: details.exception, stackTrace: details.stack);
+  };
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -59,6 +52,7 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => QuizBloc()),
+        BlocProvider(create: (context) => HomeBloc())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
