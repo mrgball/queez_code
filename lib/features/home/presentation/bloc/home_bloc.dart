@@ -14,7 +14,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<GetCategoriesEvent>(_onGetCategories);
   }
 
-  Future<void> _onGetCategories(
+  void _onGetCategories(
     GetCategoriesEvent event,
     Emitter<HomeState> emit,
   ) async {
@@ -27,15 +27,19 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         throw 'Data categories is empty';
       }
 
-      List<Category> categories =
-          response.map((item) => CategoryModel.fromJson(item)).toList();
+      List<Category> categories = [];
+
+      for (var category in response) {
+        if (category['name'] == 'uncategorized') continue;
+
+        categories.add(CategoryModel.fromJson(category));
+      }
 
       emit(state.copyWith(
         status: BlocStatus.loaded,
         categories: categories,
       ));
-    } catch (e, s) {
-      print('object: $e \n $s');
+    } catch (e) {
       emit(state.copyWith(status: BlocStatus.error));
     }
   }
