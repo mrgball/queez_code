@@ -1,10 +1,10 @@
 import 'package:code_queez/core/config/enum.dart';
 import 'package:code_queez/core/config/extension.dart';
+import 'package:code_queez/core/shared/widget/background_graphic.dart';
 import 'package:code_queez/core/shared/widget/custom_button.dart';
 import 'package:code_queez/features/quiz/domain/entity/question.dart';
 import 'package:code_queez/features/quiz/presentation/bloc/quiz_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../home/domain/entity/category.dart';
@@ -42,48 +42,58 @@ class _QuizScreenState extends State<QuizScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: BlocSelector<QuizBloc, QuizState, QuizState>(
-          selector: (state) => state,
-          builder: (context, state) {
-            final currentSoal = state.questions[state.currentQuestionIndex];
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: BackgroundGraphicView(
+              color: context.tealGreenDark.withOpacity(0.05),
+            ),
+          ),
+          SafeArea(
+            child: BlocSelector<QuizBloc, QuizState, QuizState>(
+              selector: (state) => state,
+              builder: (context, state) {
+                final currentSoal = state.questions[state.currentQuestionIndex];
 
-            if (state.status == BlocStatus.loading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+                if (state.status == BlocStatus.loading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-            if (state.status == BlocStatus.error) {
-              return const Center(child: Text('Error loading questions'));
-            }
+                if (state.status == BlocStatus.error) {
+                  return const Center(child: Text('Error loading questions'));
+                }
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-              child: Column(
-                children: [
-                  ..._buildHeader(state),
-                  SizedBox(height: context.screenHeight * 0.03),
-                  _buildSoal(currentSoal),
-                  SizedBox(height: context.screenHeight * 0.02),
-                  _buildAnswer(currentSoal),
-                  const Spacer(),
-                  ValueListenableBuilder(
-                    valueListenable: _selectedAnswer,
-                    builder: (context, selectedAnswer, child) {
-                      return CustomButton(
-                        text: 'Submit Answer',
-                        onPressed: () {},
-                        height: 52,
-                        isLoading: state.status == BlocStatus.loading,
-                        backgroundColor: context.tealGreenDark,
-                        isDisabled: _selectedAnswer.value == null,
-                      );
-                    },
-                  )
-                ],
-              ),
-            );
-          },
-        ),
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  child: Column(
+                    children: [
+                      ..._buildHeader(state),
+                      SizedBox(height: context.screenHeight * 0.03),
+                      _buildSoal(currentSoal),
+                      SizedBox(height: context.screenHeight * 0.02),
+                      _buildAnswer(currentSoal),
+                      const Spacer(),
+                      ValueListenableBuilder(
+                        valueListenable: _selectedAnswer,
+                        builder: (context, selectedAnswer, child) {
+                          return CustomButton(
+                            text: 'Submit Answer',
+                            onPressed: () {},
+                            height: 52,
+                            isLoading: state.status == BlocStatus.loading,
+                            backgroundColor: context.tealGreenDark,
+                            isDisabled: _selectedAnswer.value == null,
+                          );
+                        },
+                      )
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -223,7 +233,9 @@ class _QuizScreenState extends State<QuizScreen> {
               ? null
               : (state.currentQuestionIndex + 1) / (state.questions.length),
           borderRadius: BorderRadius.circular(18),
-          backgroundColor: Colors.grey.shade300,
+          backgroundColor: context.tealGreenLight.withOpacity(0.2),
+          color: context.tealGreenDark,
+          semanticsLabel: 'Progress',
           valueColor: AlwaysStoppedAnimation<Color>(context.tealGreenLight),
           minHeight: 7,
         ),
