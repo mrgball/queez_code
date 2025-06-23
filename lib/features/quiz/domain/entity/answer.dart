@@ -17,6 +17,10 @@ class Answer extends Equatable {
     this.F,
   });
 
+  List<String> toList() {
+    return [A, B, C, D, if (E != null) E!, if (F != null) F!];
+  }
+
   @override
   List<Object?> get props => [
         A,

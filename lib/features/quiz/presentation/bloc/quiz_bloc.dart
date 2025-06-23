@@ -38,6 +38,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
 
       emit(state.copyWith(
         status: BlocStatus.loaded,
+        currentQuestionIndex: 0,
         questions: questions,
       ));
     } catch (e, s) {

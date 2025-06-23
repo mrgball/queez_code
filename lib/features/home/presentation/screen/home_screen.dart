@@ -4,7 +4,6 @@ import 'package:code_queez/core/config/route.dart';
 import 'package:code_queez/features/home/presentation/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,6 +14,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ValueNotifier<int> _selectedIndex = ValueNotifier(0);
+
+  final List<Color> colorPalette = [
+    Colors.redAccent,
+    Colors.green,
+    Colors.blueAccent,
+    Colors.orange,
+    Colors.purple,
+    Colors.teal,
+  ];
 
   @override
   void initState() {
@@ -52,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                SizedBox(height: context.screenHeight * 0.04),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Center(
@@ -59,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Pick a card to play quiz',
                       style: context.textTheme.headlineLarge?.copyWith(
                         color: context.textDark,
-                        fontSize: 50,
                         fontWeight: FontWeight.w900,
                       ),
                       textAlign: TextAlign.center,
@@ -83,39 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 24),
                 if (state.categories.isNotEmpty) _buildCategories(state),
                 const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: SizedBox(
-                    height: context.screenHeight * 0.07,
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: context.textDark,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(32),
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.pushNamed(
-                          context,
-                          MyRouter.chooseDifficulty,
-                          arguments: {
-                            'category': state.categories[_selectedIndex.value],
-                          },
-                        );
-                      },
-                      child: Text(
-                        'Play Quiz',
-                        style: context.textTheme.bodyLarge?.copyWith(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -135,86 +110,53 @@ class _HomeScreenState extends State<HomeScreen> {
         itemCount: state.categories.length,
         itemBuilder: (context, index) {
           final item = state.categories[index];
+          final color = colorPalette[index % colorPalette.length];
 
-          return ValueListenableBuilder<int>(
-            valueListenable: _selectedIndex,
-            builder: (context, value, child) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
-                child: VisibilityDetector(
-                  key: Key('quiz-$index'),
-                  onVisibilityChanged: (info) {
-                    if (info.visibleFraction > 0.6) {
-                      _selectedIndex.value = index;
-                    }
-                  },
-                  child: Text(item.name, style: context.textTheme.bodyLarge),
-                  // child: Transform.rotate(
-                  //   angle: getRotationAngle(index),
-                  //   child: _quizCard(
-                  //     title: item.name,
-                  //     imageUrl: item['imageUrl'] ?? '',
-                  //     description: item['description'],
-                  //     hp: item['hp'],
-                  //     color: item['color'],
-                  //     image: item['icon'],
-                  //   ),
-                  // ),
-                ),
+          return GestureDetector(
+            onTap: () {
+              Navigator.pushNamed(
+                context,
+                MyRouter.chooseDifficulty,
+                arguments: {
+                  'category': item,
+                  'withAnimation': true,
+                },
               );
             },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              alignment: Alignment.center,
+              width: context.screenWidth * 0.7,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: color,
+                  width: 1.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.12),
+                    blurRadius: 2,
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    item.name,
+                    style: context.textTheme.displaySmall?.copyWith(
+                      color: context.textDark,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _quizCard({
-    required String title,
-    required String description,
-    required int hp,
-    required Color color,
-    required IconData image,
-    required String imageUrl,
-  }) {
-    return Container(
-      width: context.screenWidth * 0.7,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color, width: 2),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: context.textTheme.headlineSmall?.copyWith(
-              color: color,
-              fontSize: 32,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            description,
-            style: context.textTheme.bodyLarge?.copyWith(
-              color: context.textDark,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 32),
-          Image.network(
-            imageUrl,
-            width: context.screenWidth * 0.2,
-          ),
-        ],
       ),
     );
   }

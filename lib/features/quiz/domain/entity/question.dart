@@ -28,6 +28,32 @@ class Question extends Equatable {
     required this.difficulty,
   });
 
+  Question copyWith({
+    int? id,
+    String? question,
+    String? descrtiption,
+    Answer? answers,
+    bool? isMultipleAnswer,
+    CorrectAnswer? correctAnswers,
+    String? answer,
+    String? explanation,
+    String? category,
+    DifficultyType? difficulty,
+  }) {
+    return Question(
+      id: id ?? this.id,
+      question: question ?? this.question,
+      descrtiption: descrtiption ?? this.descrtiption,
+      answers: answers ?? this.answers,
+      isMultipleAnswer: isMultipleAnswer ?? this.isMultipleAnswer,
+      correctAnswers: correctAnswers ?? this.correctAnswers,
+      answer: answer ?? this.answer,
+      explanation: explanation ?? this.explanation,
+      category: category ?? this.category,
+      difficulty: difficulty ?? this.difficulty,
+    );
+  }
+
   @override
   List<Object?> get props => [
         id,

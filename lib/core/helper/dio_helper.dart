@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:requests_inspector/requests_inspector.dart';
 // import 'package:requests_inspector/requests_inspector.dart';
 
 class DioHelper {
@@ -18,7 +19,7 @@ class DioHelper {
           },
         )) {
     dio.interceptors.addAll([
-      // RequestsInspectorInterceptor(),
+      RequestsInspectorInterceptor(),
       // DioLoggingInterceptor(),
     ]);
   }
