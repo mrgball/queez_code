@@ -53,14 +53,21 @@ class _QuizScreenState extends State<QuizScreen> {
             child: BlocSelector<QuizBloc, QuizState, QuizState>(
               selector: (state) => state,
               builder: (context, state) {
-                final currentSoal = state.questions[state.currentQuestionIndex];
+                final questions = state.questions;
+                final currentIndex = state.currentQuestionIndex;
+
+                final Question? currentSoal =
+                    (questions.isNotEmpty && currentIndex < questions.length)
+                        ? questions[currentIndex]
+                        : null;
 
                 if (state.status == BlocStatus.loading) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                if (state.status == BlocStatus.error) {
-                  return const Center(child: Text('Error loading questions'));
+                if (state.status == BlocStatus.error || currentSoal == null) {
+                  return const Center(
+                      child: Text('Soal tidak tersedia atau error'));
                 }
 
                 return Padding(
@@ -92,7 +99,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 );
               },
             ),
-          ),
+          )
         ],
       ),
     );
@@ -108,6 +115,10 @@ class _QuizScreenState extends State<QuizScreen> {
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final answerText = answers[index];
+
+        if (answerText.isEmpty) {
+          return const SizedBox.shrink();
+        }
 
         return ValueListenableBuilder<Question?>(
           valueListenable: _selectedAnswer,
@@ -127,7 +138,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 side: BorderSide(
                   color: (isSelected)
                       ? Colors.transparent
-                      : context.tealGreenDark.withOpacity(0.5),
+                      : context.tealGreenDark.withValues(alpha: 0.5),
                   width: 1.5,
                 ),
               ),
@@ -136,7 +147,7 @@ class _QuizScreenState extends State<QuizScreen> {
               minLeadingWidth: 0,
               title: Text(
                 answerText,
-                style: context.textTheme.bodyLarge?.copyWith(
+                style: context.textTheme.titleMedium?.copyWith(
                   color: (isSelected) ? Colors.white : context.tealGreenDark,
                   fontWeight: (isSelected) ? FontWeight.w700 : FontWeight.w500,
                 ),
@@ -175,7 +186,7 @@ class _QuizScreenState extends State<QuizScreen> {
           // Tombol Back
           Container(
             decoration: BoxDecoration(
-              color: context.tealGreen.withOpacity(0.5),
+              color: context.tealGreen.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
             child: IconButton(
@@ -211,7 +222,7 @@ class _QuizScreenState extends State<QuizScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: context.tealGreenDark.withOpacity(0.5),
+              color: context.tealGreenDark.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(50),
             ),
             child: Text(
@@ -233,7 +244,7 @@ class _QuizScreenState extends State<QuizScreen> {
               ? null
               : (state.currentQuestionIndex + 1) / (state.questions.length),
           borderRadius: BorderRadius.circular(18),
-          backgroundColor: context.tealGreenLight.withOpacity(0.2),
+          backgroundColor: context.tealGreenLight.withValues(alpha: 0.5),
           color: context.tealGreenDark,
           semanticsLabel: 'Progress',
           valueColor: AlwaysStoppedAnimation<Color>(context.tealGreenLight),
