@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:code_queez/core/config/enum.dart';
 import 'package:code_queez/core/utils/injector.dart';
@@ -13,6 +16,15 @@ part 'quiz_state.dart';
 class QuizBloc extends Bloc<QuizEvent, QuizState> {
   QuizBloc() : super(const QuizState()) {
     on<GetQuizQuestionsEvent>(_onGetQuizQuestionsEvent);
+    on<AnswerProccessingEvent>(_onProccessingAnswer);
+  }
+
+  void _onProccessingAnswer(
+    AnswerProccessingEvent event,
+    Emitter<QuizState> emit,
+  ) async {
+    print('event answers: ${event.question.question}');
+    print('event. correct answer ${event.answer}');
   }
 
   void _onGetQuizQuestionsEvent(

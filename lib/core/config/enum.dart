@@ -10,3 +10,8 @@ enum DifficultyType {
   medium,
   hard,
 }
+
+enum ButtonVariant {
+  filled,
+  outlined,
+}

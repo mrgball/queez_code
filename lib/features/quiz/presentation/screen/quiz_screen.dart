@@ -24,19 +24,17 @@ class QuizScreen extends StatefulWidget {
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  final ValueNotifier<Question?> _selectedAnswer =
-      ValueNotifier<Question?>(null);
+  late final QuizBloc _quizBloc = context.read<QuizBloc>();
+  final ValueNotifier<String?> _selectedAnswer = ValueNotifier<String?>(null);
 
   @override
   void initState() {
     super.initState();
 
-    context.read<QuizBloc>().add(
-          GetQuizQuestionsEvent(
-            category: widget.category,
-            difficulty: widget.difficulty,
-          ),
-        );
+    _quizBloc.add(GetQuizQuestionsEvent(
+      category: widget.category,
+      difficulty: widget.difficulty,
+    ));
   }
 
   @override
@@ -86,7 +84,11 @@ class _QuizScreenState extends State<QuizScreen> {
                         builder: (context, selectedAnswer, child) {
                           return CustomButton(
                             text: 'Submit Answer',
-                            onPressed: () {},
+                            onPressed: () async {
+                              await showCustomDialog(
+                                currentSoal,
+                              );
+                            },
                             height: 52,
                             isLoading: state.status == BlocStatus.loading,
                             backgroundColor: context.tealGreenDark,
@@ -105,6 +107,90 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
+  Future<void> showCustomDialog(
+    Question currentSoal,
+  ) async {
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: context.textDark.withOpacity(0.3),
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 16),
+                    Text(
+                      'Answer Confirmation',
+                      style: context.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold, color: context.textDark),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'After submitting, your choice will be locked. Make sure everything looks good!',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: CustomButton(
+                            text: "Cancel",
+                            onPressed: () => Navigator.of(context).pop(),
+                            variant: ButtonVariant.outlined,
+                            backgroundColor: Colors.red,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: CustomButton(
+                              text: "Yes",
+                              backgroundColor: context.tealGreen,
+                              onPressed: () {
+                                if (_selectedAnswer.value == null) return;
+
+                                _quizBloc.add(
+                                  AnswerProccessingEvent(
+                                    question: currentSoal,
+                                    answer: _selectedAnswer.value!,
+                                  ),
+                                );
+                              }),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+
+              // Close button (pojok kanan atas)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  icon: const Icon(Icons.close, size: 20),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildAnswer(Question data) {
     final answers = data.answers.toList();
 
@@ -120,11 +206,11 @@ class _QuizScreenState extends State<QuizScreen> {
           return const SizedBox.shrink();
         }
 
-        return ValueListenableBuilder<Question?>(
+        return ValueListenableBuilder<String?>(
           valueListenable: _selectedAnswer,
           builder: (context, selectedAnswer, child) {
-            final isSelected = (selectedAnswer != null) &&
-                (selectedAnswer.answer == answerText);
+            final isSelected =
+                (selectedAnswer != null) && (selectedAnswer == answerText);
 
             return ListTile(
               trailing: Icon((isSelected) ? Icons.check : null),
@@ -158,7 +244,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   return;
                 }
 
-                _selectedAnswer.value = data.copyWith(answer: answerText);
+                _selectedAnswer.value = '';
               },
             );
           },

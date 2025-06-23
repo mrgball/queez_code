@@ -1,3 +1,4 @@
+import 'package:code_queez/core/config/enum.dart';
 import 'package:code_queez/core/config/extension.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +11,7 @@ class CustomButton extends StatelessWidget {
   final Color? textColor;
   final double? height;
   final TextStyle? textStyle;
+  final ButtonVariant variant;
 
   const CustomButton({
     super.key,
@@ -21,22 +23,34 @@ class CustomButton extends StatelessWidget {
     this.isDisabled = false,
     this.backgroundColor,
     this.textColor,
+    this.variant = ButtonVariant.filled,
   });
 
   @override
   Widget build(BuildContext context) {
     final isButtonDisabled = isDisabled || isLoading;
+    final Color effectiveBackground = backgroundColor ?? context.tealGreen;
+    final Color effectiveTextColor = textColor ??
+        (variant == ButtonVariant.outlined
+            ? effectiveBackground
+            : Colors.white);
 
     return SizedBox(
       width: double.infinity,
       height: height ?? 48,
       child: ElevatedButton(
-        onPressed: (isButtonDisabled) ? null : onPressed,
+        onPressed: isButtonDisabled ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: (isButtonDisabled)
-              ? Colors.grey
-              : backgroundColor ?? Theme.of(context).primaryColor,
-          foregroundColor: textColor ?? Colors.white,
+          backgroundColor: variant == ButtonVariant.filled
+              ? ((isButtonDisabled) ? Colors.grey : effectiveBackground)
+              : Colors.transparent,
+          foregroundColor: effectiveTextColor,
+          elevation: (variant == ButtonVariant.filled) ? 2 : 0,
+          side: BorderSide(
+            color:
+                (isButtonDisabled) ? Colors.grey.shade400 : effectiveBackground,
+            width: 1.5,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
@@ -55,7 +69,7 @@ class CustomButton extends StatelessWidget {
                 style: textStyle ??
                     context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: textColor ?? Colors.white,
+                      color: effectiveTextColor,
                     ),
               ),
       ),

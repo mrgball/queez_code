@@ -19,3 +19,16 @@ class GetQuizQuestionsEvent extends QuizEvent {
   @override
   List<Object> get props => [category, difficulty];
 }
+
+class AnswerProccessingEvent extends QuizEvent {
+  final String answer;
+  final Question question;
+
+  const AnswerProccessingEvent({
+    required this.question,
+    required this.answer,
+  });
+
+  @override
+  List<Object> get props => [question, answer];
+}
