@@ -4,7 +4,6 @@ import 'package:code_queez/core/config/global.dart';
 import 'package:code_queez/core/shared/widget/background_graphic.dart';
 import 'package:code_queez/core/shared/widget/custom_button.dart';
 import 'package:code_queez/features/quiz/domain/entity/question.dart';
-import 'package:code_queez/features/quiz/domain/entity/user_answer.dart';
 import 'package:code_queez/features/quiz/presentation/bloc/quiz_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

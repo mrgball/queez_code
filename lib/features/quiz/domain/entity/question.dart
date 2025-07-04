@@ -1,5 +1,4 @@
 import 'package:code_queez/core/config/enum.dart';
-import 'package:code_queez/features/quiz/domain/entity/answer.dart';
 import 'package:equatable/equatable.dart';
 
 class Question extends Equatable {

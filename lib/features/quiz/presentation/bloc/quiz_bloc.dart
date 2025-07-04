@@ -4,7 +4,6 @@ import 'package:code_queez/core/utils/injector.dart';
 import 'package:code_queez/features/home/domain/entity/category.dart';
 import 'package:code_queez/features/quiz/data/model/question_model.dart';
 import 'package:code_queez/features/quiz/domain/entity/question.dart';
-import 'package:code_queez/features/quiz/domain/entity/user_answer.dart';
 import 'package:code_queez/features/quiz/domain/usecase/quiz_usecase.dart';
 import 'package:equatable/equatable.dart';
 
@@ -67,9 +66,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
         currentQuestionIndex: 0,
         questions: questions,
       ));
-    } catch (e, s) {
-      print('asdad: $e \n $s');
-
+    } catch (e) {
       emit(state.copyWith(
         status: BlocStatus.error,
         questions: [],

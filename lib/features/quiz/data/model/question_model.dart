@@ -1,6 +1,4 @@
 import 'package:code_queez/core/config/enum.dart';
-import 'package:code_queez/features/quiz/data/model/answer_model.dart';
-import 'package:code_queez/features/quiz/data/model/correct_answer_model.dart';
 import 'package:code_queez/features/quiz/domain/entity/question.dart';
 
 class QuestionModel extends Question {
