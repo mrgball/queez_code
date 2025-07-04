@@ -53,6 +53,9 @@ class _QuizScreenState extends State<QuizScreen> {
               selector: (state) => state,
               builder: (context, state) {
                 final Question? currentSoal = state.currentSoal;
+                print('state isCorrect Answer: ${state.isCorrectAnswer}');
+                print(
+                    'state correctAnswer Answer: ${state.correctAnswerAbjad}');
 
                 if (state.status == BlocStatus.loading) {
                   return const Center(child: CircularProgressIndicator());
@@ -64,32 +67,18 @@ class _QuizScreenState extends State<QuizScreen> {
                   );
                 }
 
-                return Padding(
+                return SingleChildScrollView(
                   padding:
                       const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ..._buildHeader(state),
                       SizedBox(height: context.screenHeight * 0.03),
                       _buildSoal(currentSoal),
                       SizedBox(height: context.screenHeight * 0.02),
                       _buildAnswer(currentSoal, state),
-                      const Spacer(),
-                      ValueListenableBuilder(
-                        valueListenable: _selectedAnswer,
-                        builder: (context, selectedAnswer, child) {
-                          return CustomButton(
-                            text: 'Submit Answer',
-                            onPressed: () async {
-                              await _showCustomDialog(currentSoal);
-                            },
-                            height: 52,
-                            isLoading: state.status == BlocStatus.loading,
-                            backgroundColor: context.tealGreenDark,
-                            isDisabled: _selectedAnswer.value == null,
-                          );
-                        },
-                      )
+                      const SizedBox(height: 80),
                     ],
                   ),
                 );
@@ -97,6 +86,31 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
           )
         ],
+      ),
+
+      // ✅ Tombol sticky di bawah
+      bottomNavigationBar: SafeArea(
+        minimum: const EdgeInsets.all(20),
+        child: ValueListenableBuilder<String?>(
+          valueListenable: _selectedAnswer,
+          builder: (context, selectedAnswer, child) {
+            final state = context.read<QuizBloc>().state;
+            final currentSoal = state.currentSoal;
+
+            return CustomButton(
+              text: 'Submit Answer',
+              onPressed: () async {
+                if (currentSoal != null && selectedAnswer != null) {
+                  await _showCustomDialog(currentSoal);
+                }
+              },
+              height: 52,
+              isLoading: state.status == BlocStatus.loading,
+              backgroundColor: context.tealGreenDark,
+              isDisabled: selectedAnswer == null,
+            );
+          },
+        ),
       ),
     );
   }
@@ -159,6 +173,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                   AnswerProccessingEvent(
                                     question: currentSoal,
                                     selectedAnswer: _selectedAnswer.value!,
+                                    context: context,
                                   ),
                                 );
                               }),
@@ -207,20 +222,39 @@ class _QuizScreenState extends State<QuizScreen> {
         return ValueListenableBuilder<String?>(
           valueListenable: _selectedAnswer,
           builder: (context, selectedAnswer, child) {
-            print('selected answer: ${_selectedAnswer.value}');
-            print('answertext: $answerKey');
-            final isSelected =
-                selectedAnswer?.toLowerCase() == answerText.toLowerCase();
+            final abjad = convertToAbjad(answerKey);
+            final selected = selectedAnswer?.toLowerCase();
+            final isSelected = selected == abjad;
+
+            final isUserAnswer = abjad == state.userAnswerAbjad;
+            final isCorrectAnswer = abjad == state.correctAnswerAbjad;
 
             return ListTile(
-              trailing: (state.isCorrectAnswer != null)
-                  ? Icon(
-                      state.isCorrectAnswer!
-                          ? Icons.check_circle
-                          : Icons.cancel,
-                      color: state.isCorrectAnswer! ? Colors.green : Colors.red,
-                    )
-                  : null,
+              trailing: (!state.hasAnswered)
+                  ? null
+                  : (isUserAnswer && state.isUserAnswerCorrect)
+                      ? const Icon(
+                          Icons.check,
+                          color: Colors.white,
+                          size: 25,
+                        )
+                      : (isUserAnswer && state.isUserAnswerIncorrect)
+                          ? const Icon(
+                              Icons.cancel,
+                              color: Colors.red,
+                              size: 25,
+                            )
+                          : (isCorrectAnswer)
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Colors.green,
+                                  size: 25,
+                                )
+                              : const Icon(
+                                  Icons.cancel,
+                                  color: Colors.red,
+                                  size: 25,
+                                ),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               selected: isSelected,
@@ -245,13 +279,15 @@ class _QuizScreenState extends State<QuizScreen> {
                   fontWeight: (isSelected) ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
-              onTap: () {
-                if (isSelected) {
-                  _selectedAnswer.value = null;
-                } else {
-                  _selectedAnswer.value = convertToAbjad(answerKey);
-                }
-              },
+              onTap: state.hasAnswered
+                  ? null
+                  : () {
+                      if (isSelected) {
+                        _selectedAnswer.value = null;
+                      } else {
+                        _selectedAnswer.value = abjad;
+                      }
+                    },
             );
           },
         );

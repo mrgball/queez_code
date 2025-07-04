@@ -23,12 +23,20 @@ class GetQuizQuestionsEvent extends QuizEvent {
 class AnswerProccessingEvent extends QuizEvent {
   final String selectedAnswer;
   final Question question;
+  final BuildContext context;
 
   const AnswerProccessingEvent({
     required this.question,
     required this.selectedAnswer,
+    required this.context,
   });
 
   @override
-  List<Object> get props => [question, selectedAnswer];
+  List<Object> get props => [
+        question,
+        selectedAnswer,
+        context,
+      ];
 }
+
+class ResetAnswerEvent extends QuizEvent {}
