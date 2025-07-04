@@ -48,11 +48,19 @@ class _HomeScreenState extends State<HomeScreen> {
       selector: (state) => state,
       builder: (context, state) {
         if (state.status == BlocStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Scaffold(
+              body: Center(
+            child: CircularProgressIndicator(),
+          ));
         }
 
         if (state.status == BlocStatus.error) {
-          return const Center(child: Text('Error loading categories'));
+          return const Scaffold(
+              body: Center(
+            child: Text(
+              'Error loading categories',
+            ),
+          ));
         }
 
         return Scaffold(

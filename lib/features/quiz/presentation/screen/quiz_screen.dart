@@ -1,8 +1,10 @@
 import 'package:code_queez/core/config/enum.dart';
 import 'package:code_queez/core/config/extension.dart';
+import 'package:code_queez/core/config/global.dart';
 import 'package:code_queez/core/shared/widget/background_graphic.dart';
 import 'package:code_queez/core/shared/widget/custom_button.dart';
 import 'package:code_queez/features/quiz/domain/entity/question.dart';
+import 'package:code_queez/features/quiz/domain/entity/user_answer.dart';
 import 'package:code_queez/features/quiz/presentation/bloc/quiz_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,13 +53,7 @@ class _QuizScreenState extends State<QuizScreen> {
             child: BlocSelector<QuizBloc, QuizState, QuizState>(
               selector: (state) => state,
               builder: (context, state) {
-                final questions = state.questions;
-                final currentIndex = state.currentQuestionIndex;
-
-                final Question? currentSoal =
-                    (questions.isNotEmpty && currentIndex < questions.length)
-                        ? questions[currentIndex]
-                        : null;
+                final Question? currentSoal = state.currentSoal;
 
                 if (state.status == BlocStatus.loading) {
                   return const Center(child: CircularProgressIndicator());
@@ -65,7 +61,8 @@ class _QuizScreenState extends State<QuizScreen> {
 
                 if (state.status == BlocStatus.error || currentSoal == null) {
                   return const Center(
-                      child: Text('Soal tidak tersedia atau error'));
+                    child: Text('Soal tidak tersedia atau error'),
+                  );
                 }
 
                 return Padding(
@@ -77,7 +74,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       SizedBox(height: context.screenHeight * 0.03),
                       _buildSoal(currentSoal),
                       SizedBox(height: context.screenHeight * 0.02),
-                      _buildAnswer(currentSoal),
+                      _buildAnswer(currentSoal, state),
                       const Spacer(),
                       ValueListenableBuilder(
                         valueListenable: _selectedAnswer,
@@ -85,9 +82,7 @@ class _QuizScreenState extends State<QuizScreen> {
                           return CustomButton(
                             text: 'Submit Answer',
                             onPressed: () async {
-                              await showCustomDialog(
-                                currentSoal,
-                              );
+                              await _showCustomDialog(currentSoal);
                             },
                             height: 52,
                             isLoading: state.status == BlocStatus.loading,
@@ -107,7 +102,7 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Future<void> showCustomDialog(
+  Future<void> _showCustomDialog(
     Question currentSoal,
   ) async {
     await showDialog(
@@ -137,9 +132,9 @@ class _QuizScreenState extends State<QuizScreen> {
                           fontWeight: FontWeight.bold, color: context.textDark),
                     ),
                     const SizedBox(height: 12),
-                    const Text(
+                    Text(
                       'After submitting, your choice will be locked. Make sure everything looks good!',
-                      style: TextStyle(fontSize: 14),
+                      style: context.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 24),
                     Row(
@@ -150,7 +145,7 @@ class _QuizScreenState extends State<QuizScreen> {
                             text: "Cancel",
                             onPressed: () => Navigator.of(context).pop(),
                             variant: ButtonVariant.outlined,
-                            backgroundColor: Colors.red,
+                            backgroundColor: Colors.black54,
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -164,7 +159,7 @@ class _QuizScreenState extends State<QuizScreen> {
                                 _quizBloc.add(
                                   AnswerProccessingEvent(
                                     question: currentSoal,
-                                    answer: _selectedAnswer.value!,
+                                    selectedAnswer: _selectedAnswer.value!,
                                   ),
                                 );
                               }),
@@ -191,8 +186,14 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
-  Widget _buildAnswer(Question data) {
-    final answers = data.answers.toList();
+  Widget _buildAnswer(
+    Question data,
+    QuizState state,
+  ) {
+    final answers = data.answers.entries
+        .where((entry) =>
+            entry.value != null && (entry.value as String).isNotEmpty)
+        .toList();
 
     return ListView.separated(
       shrinkWrap: true,
@@ -200,20 +201,27 @@ class _QuizScreenState extends State<QuizScreen> {
       itemCount: answers.length,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
-        final answerText = answers[index];
-
-        if (answerText.isEmpty) {
-          return const SizedBox.shrink();
-        }
+        final answerEntry = answers[index];
+        final answerKey = answerEntry.key;
+        final answerText = answerEntry.value as String;
 
         return ValueListenableBuilder<String?>(
           valueListenable: _selectedAnswer,
           builder: (context, selectedAnswer, child) {
+            print('selected answer: ${_selectedAnswer.value}');
+            print('answertext: $answerKey');
             final isSelected =
-                (selectedAnswer != null) && (selectedAnswer == answerText);
+                selectedAnswer?.toLowerCase() == answerText.toLowerCase();
 
             return ListTile(
-              trailing: Icon((isSelected) ? Icons.check : null),
+              trailing: (state.isCorrectAnswer != null)
+                  ? Icon(
+                      state.isCorrectAnswer!
+                          ? Icons.check_circle
+                          : Icons.cancel,
+                      color: state.isCorrectAnswer! ? Colors.green : Colors.red,
+                    )
+                  : null,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               selected: isSelected,
@@ -224,7 +232,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 side: BorderSide(
                   color: (isSelected)
                       ? Colors.transparent
-                      : context.tealGreenDark.withValues(alpha: 0.5),
+                      : context.tealGreenDark.withOpacity(0.5),
                   width: 1.5,
                 ),
               ),
@@ -241,10 +249,9 @@ class _QuizScreenState extends State<QuizScreen> {
               onTap: () {
                 if (isSelected) {
                   _selectedAnswer.value = null;
-                  return;
+                } else {
+                  _selectedAnswer.value = convertToAbjad(answerKey);
                 }
-
-                _selectedAnswer.value = '';
               },
             );
           },

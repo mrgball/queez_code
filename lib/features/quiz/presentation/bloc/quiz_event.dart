@@ -21,14 +21,14 @@ class GetQuizQuestionsEvent extends QuizEvent {
 }
 
 class AnswerProccessingEvent extends QuizEvent {
-  final String answer;
+  final String selectedAnswer;
   final Question question;
 
   const AnswerProccessingEvent({
     required this.question,
-    required this.answer,
+    required this.selectedAnswer,
   });
 
   @override
-  List<Object> get props => [question, answer];
+  List<Object> get props => [question, selectedAnswer];
 }

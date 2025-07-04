@@ -25,28 +25,10 @@ class QuestionModel extends Question {
               (json['description'] as String).isEmpty)
           ? '-'
           : json['description'],
-      answers: (json['answers'] != null && json['answers'].isNotEmpty)
-          ? AnswerModel.fromJson(json['answers'])
-          : const AnswerModel(
-              A: '-',
-              B: '-',
-              C: '-',
-              D: '-',
-              E: null,
-              F: null,
-            ),
+      answers: json['answers'] ?? {},
       isMultipleAnswer:
           json['multiple_correct_answers']?.toLowerCase() == 'true',
-      correctAnswers: (json['correct_answers'] != null)
-          ? CorrectAnswerModel.fromJson(json['correct_answers'])
-          : const CorrectAnswerModel(
-              correctA: false,
-              correctB: false,
-              correctC: false,
-              correctD: false,
-              correctE: false,
-              correctF: false,
-            ),
+      correctAnswers: json['correct_answers'] ?? {},
       answer: json['correct_answer'] ?? '',
       explanation: (json['explanation'] == null) ? '-' : json['explanation'],
       category: json['category'] ?? '-',

@@ -1,15 +1,14 @@
 import 'package:code_queez/core/config/enum.dart';
 import 'package:code_queez/features/quiz/domain/entity/answer.dart';
-import 'package:code_queez/features/quiz/domain/entity/correct_answer.dart';
 import 'package:equatable/equatable.dart';
 
 class Question extends Equatable {
   final int id;
   final String question;
   final String descrtiption;
-  final Answer answers;
+  final Map<String, dynamic> answers;
   final bool isMultipleAnswer;
-  final CorrectAnswer correctAnswers;
+  final Map<String, dynamic> correctAnswers;
   final String answer;
   final String? explanation;
   final String category;
@@ -32,9 +31,9 @@ class Question extends Equatable {
     int? id,
     String? question,
     String? descrtiption,
-    Answer? answers,
+    Map<String, dynamic>? answers,
     bool? isMultipleAnswer,
-    CorrectAnswer? correctAnswers,
+    Map<String, dynamic>? correctAnswers,
     String? answer,
     String? explanation,
     String? category,

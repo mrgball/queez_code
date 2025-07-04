@@ -28,6 +28,17 @@ class Answer extends Equatable {
     ];
   }
 
+  Map<String, String?> toMap() {
+    return {
+      'A': A,
+      'B': B,
+      'C': C,
+      'D': D,
+      'E': E,
+      'F': F,
+    };
+  }
+
   @override
   List<Object?> get props => [
         A,

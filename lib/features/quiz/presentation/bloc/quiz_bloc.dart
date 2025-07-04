@@ -1,12 +1,10 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:bloc/bloc.dart';
 import 'package:code_queez/core/config/enum.dart';
 import 'package:code_queez/core/utils/injector.dart';
 import 'package:code_queez/features/home/domain/entity/category.dart';
 import 'package:code_queez/features/quiz/data/model/question_model.dart';
 import 'package:code_queez/features/quiz/domain/entity/question.dart';
+import 'package:code_queez/features/quiz/domain/entity/user_answer.dart';
 import 'package:code_queez/features/quiz/domain/usecase/quiz_usecase.dart';
 import 'package:equatable/equatable.dart';
 
@@ -22,9 +20,25 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   void _onProccessingAnswer(
     AnswerProccessingEvent event,
     Emitter<QuizState> emit,
-  ) async {
-    print('event answers: ${event.question.question}');
-    print('event. correct answer ${event.answer}');
+  ) {
+    // Mengetahui jawaban benar dari tiap soal
+    final correctAnswers = event.question.correctAnswers;
+
+    // mendapatkan jawaban yang user telah jawab
+    final userFinalAnswer = event.selectedAnswer;
+
+    // lalu proses jawaban user sesuai key jawaban benar dari response
+    final selectedKey = 'answer_${userFinalAnswer}_correct';
+
+    // cek apakah jawaban yang user jawaban bernilai true di response
+    final isCorrect = correctAnswers[selectedKey]?.toLowerCase() == 'true';
+
+    // handling jawaban user dan simpan di state
+    if (isCorrect) {
+      emit(state.copyWith(isCorrectAnswer: true));
+    } else {
+      emit(state.copyWith(isCorrectAnswer: false));
+    }
   }
 
   void _onGetQuizQuestionsEvent(
