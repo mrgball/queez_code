@@ -40,3 +40,16 @@ class AnswerProccessingEvent extends QuizEvent {
 }
 
 class ResetAnswerEvent extends QuizEvent {}
+
+class NextQuestionEvent extends QuizEvent {
+  final BuildContext context;
+  final bool isReview;
+
+  const NextQuestionEvent(
+    this.context, {
+    this.isReview = false,
+  });
+
+  @override
+  List<Object> get props => [context];
+}

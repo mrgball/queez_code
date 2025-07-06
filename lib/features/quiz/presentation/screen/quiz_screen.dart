@@ -53,9 +53,6 @@ class _QuizScreenState extends State<QuizScreen> {
               selector: (state) => state,
               builder: (context, state) {
                 final Question? currentSoal = state.currentSoal;
-                print('state isCorrect Answer: ${state.isCorrectAnswer}');
-                print(
-                    'state correctAnswer Answer: ${state.correctAnswerAbjad}');
 
                 if (state.status == BlocStatus.loading) {
                   return const Center(child: CircularProgressIndicator());
@@ -89,28 +86,9 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
 
       // ✅ Tombol sticky di bawah
-      bottomNavigationBar: SafeArea(
-        minimum: const EdgeInsets.all(20),
-        child: ValueListenableBuilder<String?>(
-          valueListenable: _selectedAnswer,
-          builder: (context, selectedAnswer, child) {
-            final state = context.read<QuizBloc>().state;
-            final currentSoal = state.currentSoal;
-
-            return CustomButton(
-              text: 'Submit Answer',
-              onPressed: () async {
-                if (currentSoal != null && selectedAnswer != null) {
-                  await _showCustomDialog(currentSoal);
-                }
-              },
-              height: 52,
-              isLoading: state.status == BlocStatus.loading,
-              backgroundColor: context.tealGreenDark,
-              isDisabled: selectedAnswer == null,
-            );
-          },
-        ),
+      bottomNavigationBar: BlocSelector<QuizBloc, QuizState, QuizState>(
+        selector: (state) => state,
+        builder: (context, state) => _buildButtonNavbar(state),
       ),
     );
   }
@@ -380,5 +358,50 @@ class _QuizScreenState extends State<QuizScreen> {
         ),
       ),
     ];
+  }
+
+  Widget _buildButtonNavbar(QuizState state) {
+    if (state.hasAnswered) {
+      return SafeArea(
+        minimum: const EdgeInsets.all(20),
+        child: CustomButton(
+          text: 'Next Soal',
+          onPressed: () {
+            _quizBloc.add(NextQuestionEvent(
+              context,
+              isReview: true,
+            ));
+            _selectedAnswer.value = null;
+          },
+          height: 52,
+          isLoading: state.status == BlocStatus.loading,
+          backgroundColor: context.tealGreenDark,
+        ),
+      );
+    }
+
+    return SafeArea(
+      minimum: const EdgeInsets.all(20),
+      child: ValueListenableBuilder<String?>(
+        valueListenable: _selectedAnswer,
+        builder: (context, selectedAnswer, child) {
+          final state = context.read<QuizBloc>().state;
+          final currentSoal = state.currentSoal;
+
+          return CustomButton(
+            text: 'Submit Answer',
+            onPressed: () async {
+              if (currentSoal != null && selectedAnswer != null) {
+                await _showCustomDialog(currentSoal);
+              }
+            },
+            height: 52,
+            isLoading: state.status == BlocStatus.loading,
+            backgroundColor: context.tealGreenDark,
+            isDisabled: selectedAnswer == null,
+          );
+        },
+      ),
+    );
   }
 }

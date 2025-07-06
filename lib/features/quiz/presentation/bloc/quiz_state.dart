@@ -8,6 +8,7 @@ class QuizState extends Equatable {
   final String? correctAnswerAbjad;
   final String? userAnswerAbjad;
   final bool hasAnswered;
+  final bool isQuestionComplete;
 
   const QuizState({
     this.status = BlocStatus.initial,
@@ -17,6 +18,7 @@ class QuizState extends Equatable {
     this.correctAnswerAbjad,
     this.userAnswerAbjad,
     this.hasAnswered = false,
+    this.isQuestionComplete = false,
   });
 
   QuizState copyWith({
@@ -27,6 +29,7 @@ class QuizState extends Equatable {
     String? correctAnswerAbjad,
     String? userAnswerAbjad,
     bool? hasAnswered,
+    bool? isQuestionComplete,
   }) {
     return QuizState(
       status: status ?? this.status,
@@ -36,6 +39,7 @@ class QuizState extends Equatable {
       correctAnswerAbjad: correctAnswerAbjad,
       userAnswerAbjad: userAnswerAbjad,
       hasAnswered: hasAnswered ?? this.hasAnswered,
+      isQuestionComplete: isQuestionComplete ?? this.isQuestionComplete,
     );
   }
 
@@ -47,6 +51,7 @@ class QuizState extends Equatable {
         correctAnswerAbjad: null,
         userAnswerAbjad: null,
         hasAnswered: false,
+        isQuestionComplete: false,
       );
 
   Question? get currentSoal =>
@@ -71,5 +76,6 @@ class QuizState extends Equatable {
         correctAnswerAbjad,
         userAnswerAbjad,
         hasAnswered,
+        isQuestionComplete,
       ];
 }
