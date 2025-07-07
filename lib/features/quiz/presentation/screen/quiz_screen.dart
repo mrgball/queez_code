@@ -95,6 +95,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   Future<void> _showCustomDialog(
     Question currentSoal,
+    QuizState state,
   ) async {
     await showDialog(
       context: context,
@@ -142,19 +143,22 @@ class _QuizScreenState extends State<QuizScreen> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: CustomButton(
-                              text: "Yes",
-                              backgroundColor: context.tealGreen,
-                              onPressed: () {
-                                if (_selectedAnswer.value == null) return;
+                            text: "Yes",
+                            backgroundColor: context.tealGreen,
+                            onPressed: () {
+                              if (_selectedAnswer.value == null) return;
 
-                                _quizBloc.add(
-                                  AnswerProccessingEvent(
-                                    question: currentSoal,
-                                    selectedAnswer: _selectedAnswer.value!,
-                                    context: context,
-                                  ),
-                                );
-                              }),
+                              _quizBloc.add(AnswerProccessingEvent(
+                                question: currentSoal,
+                                selectedAnswer: _selectedAnswer.value!,
+                                context: context,
+                                onShowDialog: () => _showResultAnswerDialog(
+                                  context,
+                                  isCorrect: state.isCorrectAnswer == true,
+                                ),
+                              ));
+                            },
+                          ),
                         ),
                       ],
                     )
@@ -328,7 +332,7 @@ class _QuizScreenState extends State<QuizScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: context.tealGreenDark.withValues(alpha: 0.5),
+              color: context.tealGreen.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(50),
             ),
             child: Text(
@@ -350,8 +354,8 @@ class _QuizScreenState extends State<QuizScreen> {
               ? null
               : (state.currentQuestionIndex + 1) / (state.questions.length),
           borderRadius: BorderRadius.circular(18),
-          backgroundColor: context.tealGreenLight.withValues(alpha: 0.5),
-          color: context.tealGreenDark,
+          backgroundColor: context.tealGreenDark.withValues(alpha: 0.2),
+          color: context.tealGreenDark.withValues(alpha: 0.5),
           semanticsLabel: 'Progress',
           valueColor: AlwaysStoppedAnimation<Color>(context.tealGreenLight),
           minHeight: 7,
@@ -385,14 +389,13 @@ class _QuizScreenState extends State<QuizScreen> {
       child: ValueListenableBuilder<String?>(
         valueListenable: _selectedAnswer,
         builder: (context, selectedAnswer, child) {
-          final state = context.read<QuizBloc>().state;
           final currentSoal = state.currentSoal;
 
           return CustomButton(
             text: 'Submit Answer',
             onPressed: () async {
               if (currentSoal != null && selectedAnswer != null) {
-                await _showCustomDialog(currentSoal);
+                await _showCustomDialog(currentSoal, state);
               }
             },
             height: 52,
@@ -401,6 +404,85 @@ class _QuizScreenState extends State<QuizScreen> {
             isDisabled: selectedAnswer == null,
           );
         },
+      ),
+    );
+  }
+
+  void _showResultAnswerDialog(
+    BuildContext context, {
+    required bool isCorrect,
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          isCorrect ? 'Jawaban Benar' : 'Jawaban Salah',
+          style: TextStyle(
+            color: isCorrect ? Colors.green : Colors.red,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
+        content: Icon(
+          isCorrect ? Icons.check_circle : Icons.cancel,
+          color: isCorrect ? Colors.green : Colors.red,
+          size: 60,
+        ),
+        actionsPadding: const EdgeInsets.only(bottom: 12, right: 16, left: 16),
+        actions: [
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  child: Text(
+                    'Review',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    _quizBloc.add(NextQuestionEvent(context));
+                    _selectedAnswer.value = null;
+                  },
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'Next',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

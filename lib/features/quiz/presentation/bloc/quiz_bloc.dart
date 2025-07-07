@@ -92,10 +92,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
 
     Navigator.of(event.context).pop();
 
-    _showResultAnswerDialog(
-      event.context,
-      isCorrect: isCorrect,
-    );
+    event.onShowDialog.call();
   }
 
   void _onGetQuizQuestionsEvent(
@@ -133,81 +130,5 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
         questions: [],
       ));
     }
-  }
-
-  void _showResultAnswerDialog(
-    BuildContext context, {
-    required bool isCorrect,
-  }) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(
-          isCorrect ? 'Jawaban Benar' : 'Jawaban Salah',
-          style: TextStyle(
-            color: isCorrect ? Colors.green : Colors.red,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        content: Icon(
-          isCorrect ? Icons.check_circle : Icons.cancel,
-          color: isCorrect ? Colors.green : Colors.red,
-          size: 60,
-        ),
-        actionsPadding: const EdgeInsets.only(bottom: 12, right: 16, left: 16),
-        actions: [
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  child: Text(
-                    'Review',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () => add(NextQuestionEvent(context)),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'Next',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }
