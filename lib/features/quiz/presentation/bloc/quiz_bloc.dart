@@ -62,8 +62,6 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
     // cek apakah jawaban yang user jawaban bernilai true di response
     final isCorrect = correctAnswers[selectedKey]?.toLowerCase() == 'true';
 
-    print('isCorrect dalam BLOC: $isCorrect');
-
     // cek key yang nilainya 'true'
     final correctAnswerKey = correctAnswers.entries
         .firstWhere(
