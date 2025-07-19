@@ -39,6 +39,12 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   @override
+  void dispose() {
+    _selectedAnswer.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -86,8 +92,12 @@ class _QuizScreenState extends State<QuizScreen> {
       ),
 
       // ✅ Tombol sticky di bawah
-      bottomNavigationBar: BlocSelector<QuizBloc, QuizState, QuizState>(
-        selector: (state) => state,
+      bottomNavigationBar: BlocConsumer<QuizBloc, QuizState>(
+        listenWhen: (previous, current) =>
+            current.currentSoal != previous.currentSoal,
+        listener: (context, state) {
+          _selectedAnswer.value = null;
+        },
         builder: (context, state) => _buildButtonNavbar(state),
       ),
     );
@@ -95,7 +105,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   Future<void> _showCustomDialog(
     Question currentSoal,
-    QuizState state,
+    bool isCorrectAnswer,
   ) async {
     await showDialog(
       context: context,
@@ -152,10 +162,6 @@ class _QuizScreenState extends State<QuizScreen> {
                                 question: currentSoal,
                                 selectedAnswer: _selectedAnswer.value!,
                                 context: context,
-                                onShowDialog: () => _showResultAnswerDialog(
-                                  context,
-                                  isCorrect: state.isCorrectAnswer == true,
-                                ),
                               ));
                             },
                           ),
@@ -395,7 +401,10 @@ class _QuizScreenState extends State<QuizScreen> {
             text: 'Submit Answer',
             onPressed: () async {
               if (currentSoal != null && selectedAnswer != null) {
-                await _showCustomDialog(currentSoal, state);
+                await _showCustomDialog(
+                  currentSoal,
+                  state.isCorrectAnswer == true,
+                );
               }
             },
             height: 52,
@@ -404,85 +413,6 @@ class _QuizScreenState extends State<QuizScreen> {
             isDisabled: selectedAnswer == null,
           );
         },
-      ),
-    );
-  }
-
-  void _showResultAnswerDialog(
-    BuildContext context, {
-    required bool isCorrect,
-  }) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: Text(
-          isCorrect ? 'Jawaban Benar' : 'Jawaban Salah',
-          style: TextStyle(
-            color: isCorrect ? Colors.green : Colors.red,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        content: Icon(
-          isCorrect ? Icons.check_circle : Icons.cancel,
-          color: isCorrect ? Colors.green : Colors.red,
-          size: 60,
-        ),
-        actionsPadding: const EdgeInsets.only(bottom: 12, right: 16, left: 16),
-        actions: [
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  child: Text(
-                    'Review',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    _quizBloc.add(NextQuestionEvent(context));
-                    _selectedAnswer.value = null;
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'Next',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

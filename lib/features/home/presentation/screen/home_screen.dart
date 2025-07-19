@@ -44,27 +44,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<HomeBloc, HomeState, HomeState>(
-      selector: (state) => state,
-      builder: (context, state) {
-        if (state.status == BlocStatus.loading) {
-          return const Scaffold(
-              body: Center(
-            child: CircularProgressIndicator(),
-          ));
-        }
+    return Scaffold(
+      body: BlocSelector<HomeBloc, HomeState, HomeState>(
+        selector: (state) => state,
+        builder: (context, state) {
+          if (state.status == BlocStatus.loading) {
+            return const Scaffold(
+                body: Center(
+              child: CircularProgressIndicator(),
+            ));
+          }
 
-        if (state.status == BlocStatus.error) {
-          return const Scaffold(
-              body: Center(
-            child: Text(
-              'Error loading categories',
-            ),
-          ));
-        }
+          if (state.status == BlocStatus.error) {
+            return const Scaffold(
+                body: Center(
+              child: Text(
+                'Error loading categories',
+              ),
+            ));
+          }
 
-        return Scaffold(
-          body: SafeArea(
+          return SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
@@ -101,19 +101,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 24),
               ],
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
   Widget _buildCategories(HomeState state) {
     return Expanded(
       child: ListView.builder(
-        scrollDirection: Axis.horizontal,
+        scrollDirection: Axis.vertical,
         padding: EdgeInsets.symmetric(
-          horizontal: context.screenWidth * 0.1,
-          vertical: context.screenHeight * 0.03,
+          horizontal: 16,
+          vertical: context.screenHeight * 0.02,
         ),
         itemCount: state.categories.length,
         itemBuilder: (context, index) {
@@ -132,9 +132,10 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              margin: const EdgeInsets.symmetric(vertical: 12),
               alignment: Alignment.center,
-              width: context.screenWidth * 0.7,
+              width: double.infinity,
+              height: context.screenHeight * 0.1,
               decoration: BoxDecoration(
                 color: Colors.transparent,
                 borderRadius: BorderRadius.circular(16),

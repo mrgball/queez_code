@@ -24,13 +24,11 @@ class AnswerProccessingEvent extends QuizEvent {
   final String selectedAnswer;
   final Question question;
   final BuildContext context;
-  final VoidCallback onShowDialog;
 
   const AnswerProccessingEvent({
     required this.question,
     required this.selectedAnswer,
     required this.context,
-    required this.onShowDialog,
   });
 
   @override
@@ -38,7 +36,6 @@ class AnswerProccessingEvent extends QuizEvent {
         question,
         selectedAnswer,
         context,
-        onShowDialog,
       ];
 }
 
