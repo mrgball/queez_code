@@ -1,11 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:requests_inspector/requests_inspector.dart';
 // import 'package:requests_inspector/requests_inspector.dart';
 
 class DioHelper {
   final Dio dio;
-  static const String baseUrl = 'https://quizapi.io';
+  static const String baseUrl = String.fromEnvironment('BASE_URL');
 
   DioHelper({
     Duration? connectTimeout,
@@ -15,7 +14,7 @@ class DioHelper {
           receiveTimeout: receiveTimeout ?? const Duration(seconds: 60),
           baseUrl: baseUrl,
           headers: {
-            "X-API-KEY": dotenv.env['API_KEY'],
+            "X-API-KEY": const String.fromEnvironment('API_KEY'),
           },
         )) {
     dio.interceptors.addAll([
