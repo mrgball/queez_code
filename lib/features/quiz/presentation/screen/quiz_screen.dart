@@ -44,6 +44,14 @@ class _QuizScreenState extends State<QuizScreen> {
     super.dispose();
   }
 
+  void _handleSelectAnswer(bool isSelected, String abjad) {
+    if (isSelected) {
+      _selectedAnswer.value = null;
+    } else {
+      _selectedAnswer.value = abjad;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -194,7 +202,9 @@ class _QuizScreenState extends State<QuizScreen> {
   ) {
     final answers = data.answers.entries
         .where((entry) =>
-            entry.value != null && (entry.value as String).isNotEmpty)
+            entry.value != null &&
+            entry.value is String &&
+            entry.value.isNotEmpty)
         .toList();
 
     return ListView.separated(
@@ -267,15 +277,9 @@ class _QuizScreenState extends State<QuizScreen> {
                   fontWeight: (isSelected) ? FontWeight.w700 : FontWeight.w500,
                 ),
               ),
-              onTap: state.hasAnswered
+              onTap: (state.hasAnswered)
                   ? null
-                  : () {
-                      if (isSelected) {
-                        _selectedAnswer.value = null;
-                      } else {
-                        _selectedAnswer.value = abjad;
-                      }
-                    },
+                  : () => _handleSelectAnswer(isSelected, abjad),
             );
           },
         );
@@ -400,12 +404,16 @@ class _QuizScreenState extends State<QuizScreen> {
           return CustomButton(
             text: 'Submit Answer',
             onPressed: () async {
-              if (currentSoal != null && selectedAnswer != null) {
-                await _showCustomDialog(
-                  currentSoal,
-                  state.isCorrectAnswer == true,
-                );
+              if (currentSoal == null && selectedAnswer == null) {
+                return;
               }
+
+              print('current soal: $currentSoal');
+
+              await _showCustomDialog(
+                currentSoal!,
+                state.isCorrectAnswer == true,
+              );
             },
             height: 52,
             isLoading: state.status == BlocStatus.loading,
