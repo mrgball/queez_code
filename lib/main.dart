@@ -1,12 +1,13 @@
 import 'package:code_queez/core/shared/screen/error_screen.dart';
 import 'package:code_queez/core/utils/supabase_util.dart';
+import 'package:code_queez/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:code_queez/features/auth/presentation/screen/login_screen.dart';
 import 'package:code_queez/features/home/presentation/bloc/home_bloc.dart';
 
 import 'package:code_queez/core/config/global.dart';
 import 'package:code_queez/core/config/route.dart';
 import 'package:code_queez/core/theme/custom_theme.dart';
 import 'package:code_queez/core/utils/injector.dart';
-import 'package:code_queez/features/home/presentation/screen/home_screen.dart';
 import 'package:code_queez/features/quiz/presentation/bloc/quiz_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,14 +60,14 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => QuizBloc()),
-        BlocProvider(create: (context) => HomeBloc())
+        BlocProvider(create: (context) => HomeBloc()),
+        BlocProvider(create: (context) => AuthBloc())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         onGenerateRoute: MyRouter.generateRoute,
-        title: 'Flutter Demo',
         theme: CustomTheme.themeData,
-        home: const HomeScreen(),
+        home: const LoginScreen(),
       ),
     );
   }

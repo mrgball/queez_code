@@ -114,6 +114,7 @@ class _QuizScreenState extends State<QuizScreen> {
   Future<void> _showCustomDialog(
     Question currentSoal,
     bool isCorrectAnswer,
+    bool isLastAnswer,
   ) async {
     await showDialog(
       context: context,
@@ -137,13 +138,17 @@ class _QuizScreenState extends State<QuizScreen> {
                   children: [
                     const SizedBox(height: 16),
                     Text(
-                      'Answer Confirmation',
+                      (isLastAnswer)
+                          ? 'Last Answer Confirmation'
+                          : 'Answer Confirmation',
                       style: context.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold, color: context.textDark),
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'After submitting, your choice will be locked. Make sure everything looks good!',
+                      (isLastAnswer)
+                          ? 'After submitting, your choice will be locked. The question will complete'
+                          : 'After submitting, your choice will be locked. Make sure everything looks good!',
                       style: context.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 24),
@@ -408,11 +413,10 @@ class _QuizScreenState extends State<QuizScreen> {
                 return;
               }
 
-              print('current soal: $currentSoal');
-
               await _showCustomDialog(
                 currentSoal!,
                 state.isCorrectAnswer == true,
+                state.isLastAnswer == true,
               );
             },
             height: 52,

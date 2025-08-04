@@ -16,7 +16,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   QuizBloc() : super(const QuizState()) {
     on<GetQuizQuestionsEvent>(_onGetQuizQuestionsEvent);
     on<AnswerProccessingEvent>(_onProccessingAnswer);
-    on<NextQuestionEvent>(_onNextQuestion);
+    on<NextQuestionEvent>(_onNextQuestion); 
     on<ResetAnswerEvent>(_onResetAnswer);
   }
 
@@ -95,6 +95,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
     _showResultAnswerDialog(
       event.context,
       isCorrect: isCorrect,
+      isLastAnswer: state.isLastAnswer,
     );
   }
 
@@ -138,7 +139,16 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   void _showResultAnswerDialog(
     BuildContext context, {
     required bool isCorrect,
+    required bool isLastAnswer,
   }) {
+    String message = (isLastAnswer && !isCorrect)
+        ? 'Jawaban Terakhir Kamu Salah'
+        : (isLastAnswer && isCorrect)
+            ? 'Jawaban Terakhir Kamu Benar'
+            : (isCorrect)
+                ? 'Jawaban Benar'
+                : 'Jawaban Salah';
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -146,7 +156,7 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
-          isCorrect ? 'Jawaban Benar' : 'Jawaban Salah',
+          message,
           style: TextStyle(
             color: isCorrect ? Colors.green : Colors.red,
             fontWeight: FontWeight.bold,
@@ -160,52 +170,80 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
         ),
         actionsPadding: const EdgeInsets.only(bottom: 12, right: 16, left: 16),
         actions: [
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+          if (isLastAnswer) ...[
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
+                    child: Text(
+                      'Rekap Jawaban Saya',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                     ),
-                  ),
-                  child: Text(
-                    'Review',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () => add(NextQuestionEvent(context)),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              ],
+            ),
+          ] else ...[
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      side: BorderSide(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    child: Text(
+                      'Review',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
                     ),
                   ),
-                  child: Text(
-                    'Next',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => add(NextQuestionEvent(context)),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      'Next',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ]
         ],
       ),
     );

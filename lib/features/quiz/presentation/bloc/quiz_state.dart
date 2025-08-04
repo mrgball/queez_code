@@ -67,6 +67,8 @@ class QuizState extends Equatable {
 
   String? get expectedAnswer => hasAnswered ? correctAnswerAbjad : null;
 
+  bool get isLastAnswer => currentQuestionIndex == questions.length - 1;
+
   @override
   List<Object?> get props => [
         status,

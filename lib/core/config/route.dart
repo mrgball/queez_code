@@ -1,3 +1,5 @@
+import 'package:code_queez/features/auth/presentation/screen/login_screen.dart';
+import 'package:code_queez/features/auth/presentation/screen/register_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../features/home/presentation/screen/home_screen.dart';
@@ -7,6 +9,8 @@ import '../shared/screen/choose_difficulty_screen.dart';
 class MyRouter {
   // DEFINING ROUTES HERE:
   static const String routeHome = '/home';
+  static const String routeRegister = '/register';
+  static const String routeLogin = '/login';
   static const String chooseDifficulty = '/choose-difficulty';
   static const String quiz = '/quiz';
 
@@ -33,7 +37,11 @@ class MyRouter {
               difficulty: arguments?['difficulty'],
             );
         break;
-
+      case routeLogin:
+        screenDestination = (_) => const LoginScreen();
+        break;
+      case routeRegister:
+        screenDestination = (_) => const RegisterScreen();
       default:
         screenDestination = (_) => const HomeScreen();
         break;
